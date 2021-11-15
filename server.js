@@ -34,20 +34,15 @@ INSERT INTO users (id, name, email, created_at) VALUES
   (5, 'Shaw', 'shaw@gmail.com', '2020-03-18 23:15:20');
 */
 
-// const Joi = require("joi");
+const Joi = require("joi");
 
-// const schema = Joi.object({
-//   username: Joi.string().min(1).required(),
-//   status: Joi.string().min(1).required(),
-// });
+const schema = Joi.object({
+  username: Joi.string().min(1).required(),
+  status: Joi.string().min(1).required(),
+});
 
-// const todoValidation = (todo) => {
-//   const { value, error } = schema.validate(todo);
-//   if (error) {
-//     return error;
-//   } else {
-//     return value;
-//   }
-// };
+const todoValidation = (todo) => {
+  schema.validate(todo);
+};
 
-// todoValidation({});
+todoValidation({});

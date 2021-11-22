@@ -3,6 +3,7 @@ const router = express.Router();
 const dbConn = require("../models/db");
 const response = require("../ultis/response");
 const HTTP_CODE = require("../ultis/httpCode");
+const todoValidation = require("../validation/todoValidation");
 
 //express mới nhất tích hợp sẵn body parser rồi nên chỉ cần sử dụng 2 dòng dưới đây
 router.use(express.json());
@@ -71,13 +72,15 @@ router.get("/todos/:id", function (req, res) {
 
 router.post("/todos", function (req, res) {
   let todo = req.body;
-  //console.log(req.body);
+  // ktra có body hay là không
   if (!todo) {
-    console.log("false");
     return response(res, HTTP_CODE.ERROR_CLIENT, "Please provide todo!", "");
   } else {
-    console.log("true");
-    console.log(todo);
+    //ktra object có hợp lệ hay không
+    let { isValid, message } = todoValidation(todo);
+    if (!isValid) {
+      return response(res, HTTP_CODE.ERROR_CLIENT, message, "");
+    }
   }
   dbConn.query(
     "INSERT INTO todos SET ? ",
@@ -100,13 +103,20 @@ router.post("/todos", function (req, res) {
 router.put("/todos/:id", function (req, res) {
   let todo_id = req.params.id;
   let todo = req.body;
-  if (!todo_id || !todo) {
-    return response(
-      res,
-      HTTP_CODE.ERROR_CLIENT,
-      "Please provide todo and todo_id",
-      ""
-    );
+
+  //ktra có id hay ko
+  if (!todo_id) {
+    return response(res, HTTP_CODE.ERROR_CLIENT, "Please provide todo_id!", "");
+  }
+  // ktra có body hay là không
+  if (!todo) {
+    return response(res, HTTP_CODE.ERROR_CLIENT, "Please provide todo!", "");
+  } else {
+    //ktra object có hợp lệ hay không
+    let { isValid, message } = todoValidation(todo);
+    if (!isValid) {
+      return response(res, HTTP_CODE.ERROR_CLIENT, message, "");
+    }
   }
   dbConn.query(
     "UPDATE todos SET ? WHERE id = ?",

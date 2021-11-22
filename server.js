@@ -11,12 +11,16 @@
 var express = require("express");
 var app = express();
 
+// cái thư viện này giúp mình sửa lỗi về cors, nghĩa là trang web ko cho mình call api từ local host, 1 chính sách gì đó để bảo vệ
+let cors = require("cors");
+app.use(cors());
+
 //import các routers
 var todo = require("./routes/todos");
 app.use("/api", todo);
 
-app.listen(3000, function () {
-  console.log("Node app is running on port 3000");
+app.listen(3005, function () {
+  console.log("Node app is running on port 3005");
 });
 module.exports = app;
 
@@ -33,16 +37,3 @@ INSERT INTO users (id, name, email, created_at) VALUES
   (4, 'James', 'james@gmail.com', '2020-03-18 23:10:20'),
   (5, 'Shaw', 'shaw@gmail.com', '2020-03-18 23:15:20');
 */
-
-const Joi = require("joi");
-
-const schema = Joi.object({
-  username: Joi.string().min(1).required(),
-  status: Joi.string().min(1).required(),
-});
-
-const todoValidation = (todo) => {
-  schema.validate(todo);
-};
-
-todoValidation({});

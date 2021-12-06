@@ -9,11 +9,15 @@ const todoValidation = require("../validation/todoValidation");
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
-router.get("/", function (req, res) {
-  return res.send({ error: true, message: "hello" });
-});
+const routerPath = {
+  getAll: "/",
+  getItem: "/:id",
+  post: "/",
+  delete: "/:id",
+  put: "/:id",
+};
 
-router.get("/todos", function (req, res) {
+router.get(routerPath.getAll, function (req, res) {
   dbConn.query("SELECT * FROM todos", function (error, results, fields) {
     //if (error) throw error;
     if (error) {
@@ -40,7 +44,7 @@ router.get("/todos", function (req, res) {
   });
 });
 
-router.get("/todos/:id", function (req, res) {
+router.get(routerPath.getItem, function (req, res) {
   let todo_id = req.params.id;
   if (!todo_id) {
     return response(res, HTTP_CODE.ERROR_CLIENT, "Please provide todo_id!", "");
@@ -70,7 +74,7 @@ router.get("/todos/:id", function (req, res) {
   );
 });
 
-router.post("/todos", function (req, res) {
+router.post(routerPath.post, function (req, res) {
   let todo = req.body;
   // ktra có body hay là không
   if (!todo) {
@@ -100,7 +104,39 @@ router.post("/todos", function (req, res) {
   );
 });
 
-router.put("/todos/:id", function (req, res) {
+router.delete(routerPath.delete, function (req, res) {
+  let todo_id = req.params.id;
+  if (!todo_id) {
+    return response(res, HTTP_CODE.ERROR_CLIENT, "Please provide todo_id", "");
+  }
+  dbConn.query(
+    "DELETE FROM todos WHERE id = ?",
+    [todo_id],
+    function (error, results, fields) {
+      if (error) {
+        return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
+      } else {
+        if (results.affectedRows === 0) {
+          return response(
+            res,
+            HTTP_CODE.NOT_FOUND,
+            "Id không tồn tại!",
+            results
+          );
+        } else {
+          return response(
+            res,
+            HTTP_CODE.SUCCESS,
+            "Todo has been deleted successfully!",
+            results
+          );
+        }
+      }
+    }
+  );
+});
+
+router.put(routerPath.put, function (req, res) {
   let todo_id = req.params.id;
   let todo = req.body;
 
@@ -137,37 +173,6 @@ router.put("/todos/:id", function (req, res) {
             res,
             HTTP_CODE.SUCCESS,
             "Todo has been updated successfully!",
-            results
-          );
-        }
-      }
-    }
-  );
-});
-router.delete("/todos/:id", function (req, res) {
-  let todo_id = req.params.id;
-  if (!todo_id) {
-    return response(res, HTTP_CODE.ERROR_CLIENT, "Please provide todo_id", "");
-  }
-  dbConn.query(
-    "DELETE FROM todos WHERE id = ?",
-    [todo_id],
-    function (error, results, fields) {
-      if (error) {
-        return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
-      } else {
-        if (results.affectedRows === 0) {
-          return response(
-            res,
-            HTTP_CODE.NOT_FOUND,
-            "Id không tồn tại!",
-            results
-          );
-        } else {
-          return response(
-            res,
-            HTTP_CODE.SUCCESS,
-            "Todo has been deleted successfully!",
             results
           );
         }

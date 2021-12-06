@@ -15,9 +15,14 @@ var app = express();
 let cors = require("cors");
 app.use(cors());
 
+const baseURL = "/api/";
+const routerPath = {
+  todo: "todos",
+};
+
 //import các routers
 var todo = require("./routes/todos");
-app.use("/api", todo);
+app.use(baseURL + routerPath.todo, todo);
 
 app.listen(3005, function () {
   console.log("Node app is running on port 3005");

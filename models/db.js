@@ -2,8 +2,8 @@ var mysql = require("mysql");
 
 var dbConn = mysql.createConnection({
   host: "localhost",
-  user: "sa",
-  password: "123",
+  user: "root",
+  password: "",
   database: "express_js_db",
 });
 

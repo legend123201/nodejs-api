@@ -3,6 +3,7 @@ const router = express.Router();
 const dbConn = require("../models/db");
 const response = require("../ultis/response");
 const HTTP_CODE = require("../ultis/httpCode");
+const RESPONSE_STRING = require("../ultis/responseString");
 const todoValidation = require("../validation/todoValidation");
 
 //express mới nhất tích hợp sẵn body parser rồi nên chỉ cần sử dụng 2 dòng dưới đây
@@ -34,10 +35,11 @@ router.get(routerPath.getAll, function (req, res) {
       */
       return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
     } else {
+      // bảng không có record nào thì results là mảng rỗng => hợp lý
       return response(
         res,
         HTTP_CODE.SUCCESS,
-        "Get todo list success!",
+        RESPONSE_STRING.GET_SUCCESS,
         results
       );
     }
@@ -45,13 +47,18 @@ router.get(routerPath.getAll, function (req, res) {
 });
 
 router.get(routerPath.getItem, function (req, res) {
-  let todo_id = req.params.id;
-  if (!todo_id) {
-    return response(res, HTTP_CODE.ERROR_CLIENT, "Please provide todo_id!", "");
+  let id = req.params.id;
+  if (!id) {
+    return response(
+      res,
+      HTTP_CODE.ERROR_CLIENT,
+      RESPONSE_STRING.MISSING_DATA + " (id)",
+      null
+    );
   }
   dbConn.query(
     "SELECT * FROM todos where id=?",
-    todo_id,
+    id,
     function (error, results, fields) {
       if (error) {
         return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
@@ -63,11 +70,16 @@ router.get(routerPath.getItem, function (req, res) {
           return response(
             res,
             HTTP_CODE.NOT_FOUND,
-            "Id không tồn tại!",
+            RESPONSE_STRING.ID_NOT_FOUND,
             results
           );
         } else {
-          return response(res, HTTP_CODE.SUCCESS, "Get todo success!", results);
+          return response(
+            res,
+            HTTP_CODE.SUCCESS,
+            RESPONSE_STRING.GET_ITEM_SUCCESS,
+            results
+          );
         }
       }
     }
@@ -75,20 +87,25 @@ router.get(routerPath.getItem, function (req, res) {
 });
 
 router.post(routerPath.post, function (req, res) {
-  let todo = req.body;
+  let body = req.body;
   // ktra có body hay là không
-  if (!todo) {
-    return response(res, HTTP_CODE.ERROR_CLIENT, "Please provide todo!", "");
+  if (!body) {
+    return response(
+      res,
+      HTTP_CODE.ERROR_CLIENT,
+      RESPONSE_STRING.MISSING_DATA + " (body)",
+      null
+    );
   } else {
     //ktra object có hợp lệ hay không
-    let { isValid, message } = todoValidation(todo);
+    let { isValid, message } = todoValidation(body);
     if (!isValid) {
-      return response(res, HTTP_CODE.ERROR_CLIENT, message, "");
+      return response(res, HTTP_CODE.ERROR_CLIENT, message, null);
     }
   }
   dbConn.query(
     "INSERT INTO todos SET ? ",
-    todo,
+    body,
     function (error, results, fields) {
       if (error) {
         return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
@@ -96,7 +113,7 @@ router.post(routerPath.post, function (req, res) {
         return response(
           res,
           HTTP_CODE.SUCCESS_CREATE,
-          "New todo has been created successfully.",
+          RESPONSE_STRING.POST_SUCCESS,
           results
         );
       }
@@ -105,13 +122,18 @@ router.post(routerPath.post, function (req, res) {
 });
 
 router.delete(routerPath.delete, function (req, res) {
-  let todo_id = req.params.id;
-  if (!todo_id) {
-    return response(res, HTTP_CODE.ERROR_CLIENT, "Please provide todo_id", "");
+  let id = req.params.id;
+  if (!id) {
+    return response(
+      res,
+      HTTP_CODE.ERROR_CLIENT,
+      RESPONSE_STRING.MISSING_DATA + " (id)",
+      null
+    );
   }
   dbConn.query(
     "DELETE FROM todos WHERE id = ?",
-    [todo_id],
+    id,
     function (error, results, fields) {
       if (error) {
         return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
@@ -120,14 +142,14 @@ router.delete(routerPath.delete, function (req, res) {
           return response(
             res,
             HTTP_CODE.NOT_FOUND,
-            "Id không tồn tại!",
+            RESPONSE_STRING.ID_NOT_FOUND,
             results
           );
         } else {
           return response(
             res,
             HTTP_CODE.SUCCESS,
-            "Todo has been deleted successfully!",
+            RESPONSE_STRING.DELETE_SUCCESS,
             results
           );
         }
@@ -137,26 +159,36 @@ router.delete(routerPath.delete, function (req, res) {
 });
 
 router.put(routerPath.put, function (req, res) {
-  let todo_id = req.params.id;
-  let todo = req.body;
+  let id = req.params.id;
+  let body = req.body;
 
   //ktra có id hay ko
-  if (!todo_id) {
-    return response(res, HTTP_CODE.ERROR_CLIENT, "Please provide todo_id!", "");
+  if (!id) {
+    return response(
+      res,
+      HTTP_CODE.ERROR_CLIENT,
+      RESPONSE_STRING.MISSING_DATA + " (id)",
+      null
+    );
   }
   // ktra có body hay là không
-  if (!todo) {
-    return response(res, HTTP_CODE.ERROR_CLIENT, "Please provide todo!", "");
+  if (!body) {
+    return response(
+      res,
+      HTTP_CODE.ERROR_CLIENT,
+      RESPONSE_STRING.MISSING_DATA + " (body)",
+      null
+    );
   } else {
     //ktra object có hợp lệ hay không
-    let { isValid, message } = todoValidation(todo);
+    let { isValid, message } = todoValidation(body);
     if (!isValid) {
-      return response(res, HTTP_CODE.ERROR_CLIENT, message, "");
+      return response(res, HTTP_CODE.ERROR_CLIENT, message, null);
     }
   }
   dbConn.query(
     "UPDATE todos SET ? WHERE id = ?",
-    [todo, todo_id],
+    [body, id],
     function (error, results, fields) {
       if (error) {
         return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
@@ -165,14 +197,14 @@ router.put(routerPath.put, function (req, res) {
           return response(
             res,
             HTTP_CODE.NOT_FOUND,
-            "Id không tồn tại!",
+            RESPONSE_STRING.ID_NOT_FOUND,
             results
           );
         } else {
           return response(
             res,
             HTTP_CODE.SUCCESS,
-            "Todo has been updated successfully!",
+            RESPONSE_STRING.PUT_SUCCESS,
             results
           );
         }

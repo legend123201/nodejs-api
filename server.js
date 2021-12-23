@@ -5,7 +5,7 @@
   npm install express --save
   npm install mysql --save
 
-  nodemon //lệnh dùng nodemon: nodemon server.js
+  nodemon //lệnh dùng nodemon là: nodemon server.js
 */
 
 var express = require("express");

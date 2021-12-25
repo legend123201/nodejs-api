@@ -14,13 +14,15 @@ const routerPath = {
     getAll: "/",
     getItem: "/:id",
     post: "/",
-    delete: "/:id",
-    put: "/:id",
     postMultiple: "/post-multiple",
+    delete: "/:id",
     deleteMultiple: "/del-multiple",
+    put: "/:id",
 };
 
+// LẤY TOÀN BỘ DANH SÁCH
 router.get(routerPath.getAll, function (req, res) {
+    //KO CÓ INPUT, TIẾN HÀNH TRUY VẤN CSDL LUÔN
     dbConn.query("SELECT * FROM todos", function (error, results, fields) {
         //if (error) throw error;
         if (error) {
@@ -43,18 +45,25 @@ router.get(routerPath.getAll, function (req, res) {
     });
 });
 
+// LẤY 1 RECORD CỦA BẢNG THEO ID
 router.get(routerPath.getItem, function (req, res) {
+    // INPUT LÀ ID
     let id = req.params.id;
+
+    // KIỂM TRA ID
     if (!id) {
         return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.MISSING_DATA + " (id)", null);
     }
+
+    // TRUY VẤN CSDL
     dbConn.query("SELECT * FROM todos where id=?", id, function (error, results, fields) {
         if (error) {
             return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
         } else {
-            //ko tồn tại id thì nó vẫn tính đây là 1 query hợp lệ (để ý những câu query có where), nên mình xét thêm trường hợp có tìm được id hay là ko
-            //console.log(results[0]); //undefined
-            //mình định dùng cách xài result.affectedRows nhưng ko đc, tại thêm xóa sửa nó cho result khác, còn cái get thì result trả về mảng data
+            // SPECIAL: ko tồn tại id thì nó vẫn tính đây là 1 query hợp lệ (để ý những câu query có where), nên mình xét thêm trường hợp có tìm được id hay là ko
+            // KIỂM TRA CÓ TÌM ĐƯỢC RECORD NÀO KHÔNG (QUERY CÓ WHERE)
+            // console.log(results[0]); //undefined
+            // mình định dùng cách xài result.affectedRows nhưng ko đc, tại thêm xóa sửa nó cho result khác, còn cái get thì result trả về mảng data
             if (!results[0]) {
                 return response(res, HTTP_CODE.NOT_FOUND, RESPONSE_STRING.ID_NOT_FOUND, results);
             } else {
@@ -64,18 +73,23 @@ router.get(routerPath.getItem, function (req, res) {
     });
 });
 
+// THÊM 1 RECORD VÀO BẢNG
 router.post(routerPath.post, function (req, res) {
+    // INPUT LÀ THÔNG TIN CỦA 1 RECORD MỚI
     let body = req.body;
-    // ktra có body hay là không
+
+    // KIỂM TRA BODY
     if (!body) {
         return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.MISSING_DATA + " (body)", null);
     } else {
-        //ktra object có hợp lệ hay không
+        // KIỂM TRA TÍNH HỢP LỆ CỦA INPUT
         let { isValid, message } = todoValidation(body);
         if (!isValid) {
             return response(res, HTTP_CODE.ERROR_CLIENT, message, null);
         }
     }
+
+    // TRUY VẤN CSDL
     dbConn.query("INSERT INTO todos SET ? ", body, function (error, results, fields) {
         if (error) {
             return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
@@ -85,18 +99,21 @@ router.post(routerPath.post, function (req, res) {
     });
 });
 
+// THÊM NHIỀU RECORD CÙNG 1 LÚC
 router.post(routerPath.postMultiple, function (req, res) {
+    // INPUT LÀ MẢNG CHỨA OBJECT LÀ THÔNG TIN RECORD MUỐN THÊM
     let body = req.body;
-    // ktra có body hay là không
+
+    // KIỂM TRA BODY
     if (!body) {
         return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.MISSING_DATA + " (body)", null);
     } else {
-        // kiểm tra body có phải mảng hay không
+        // KIỂM TRA CÓ PHẢI MẢNG HAY KO
         if (!Array.isArray(body)) {
             return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.ERROR_DATA, null);
         }
 
-        // ktra mảng object có hợp lệ hay không
+        // KIỂM TRA MẢNG OBJECT CÓ HỢP LỆ KO
         let isError = false;
         let messageError = "";
 
@@ -113,11 +130,11 @@ router.post(routerPath.postMultiple, function (req, res) {
         }
     }
 
+    // TRUY VẤN CSDL
     // mình đã viết doc phần thêm và xóa nhiều phần tử cùng lúc, hãy tìm và đọc để hiểu rõ code dưới đây
-    let table = "todos";
     let keys = Object.keys(body[0]); // lấy các key của phần tử đầu
     let values = body.map((obj) => keys.map((key) => obj[key])); // dòng này giúp mình khớp thứ tự các keys trong object với keys.join(",") trong dòng sql
-    let sql = "INSERT INTO " + table + " (" + keys.join(",") + ") VALUES ?";
+    let sql = "INSERT INTO todos (" + keys.join(",") + ") VALUES ?";
     dbConn.query(sql, [values], function (error, results, fields) {
         if (error) {
             // thêm 1 dòng lỗi thì nó cũng sẽ trả về là lỗi
@@ -128,16 +145,22 @@ router.post(routerPath.postMultiple, function (req, res) {
     });
 });
 
+// XÓA 1 RECORD
 router.delete(routerPath.delete, function (req, res) {
-    console.log("aa");
+    // INPUT LÀ 1 ID
     let id = req.params.id;
+
+    // KIỂM TRA ID
     if (!id) {
         return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.MISSING_DATA + " (id)", null);
     }
+
+    // TRUY VẤN CSDL
     dbConn.query("DELETE FROM todos WHERE id = ?", id, function (error, results, fields) {
         if (error) {
             return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
         } else {
+            // KIỂM TRA XÓA ĐƯỢC RECORD NÀO KHÔNG (QUERY CÓ WHERE)
             if (results.affectedRows === 0) {
                 return response(res, HTTP_CODE.NOT_FOUND, RESPONSE_STRING.ID_NOT_FOUND, results);
             } else {
@@ -147,15 +170,17 @@ router.delete(routerPath.delete, function (req, res) {
     });
 });
 
+// XÓA NHIỀU RECORD CÙNG 1 LÚC
 // delete multiple dùng post ko dùng router.delete, vì nó tự hiểu rằng chữ /multiple là id và chạy cái router xóa theo 1 id
 router.post(routerPath.deleteMultiple, function (req, res) {
+    // INPUT LÀ MẢNG CHỨA 1 ID HOẶC CHỨA OBJECT LÀ THÔNG TIN 2 HOẶC NHIỀU CONDITON (ĐỂ XÓA BẢNG NHIỀU HƠN 1 KHÓA CHÍNH)
     let body = req.body;
 
-    // ktra có body hay là không
+    // KIỂM TRA BODY
     if (!body) {
         return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.MISSING_DATA + " (body)", null);
     } else {
-        // kiểm tra body có phải mảng hay không
+        // KIỂM TRA CÓ PHẢI MẢNG HAY KO
         if (!Array.isArray(body)) {
             return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.ERROR_DATA, null);
         }
@@ -177,11 +202,11 @@ router.post(routerPath.deleteMultiple, function (req, res) {
     //     }
     // });
 
+    // TRUY VẤN CSDL
     // đây là trường hợp xóa nhưng phải khớp 2 điều kiện, thích hợp xóa bảng có 2 khóa chính
-    let table = "todos";
     let keys = Object.keys(body[0]); // lấy các key của phần tử đầu
     let values = body.map((obj) => keys.map((key) => obj[key]));
-    let sql = "DELETE FROM " + table + " WHERE (" + keys.join(",") + ") IN ( ? )";
+    let sql = "DELETE FROM todos WHERE (" + keys.join(",") + ") IN ( ? )";
 
     dbConn.query(sql, [values], function (error, results, fields) {
         if (error) {
@@ -197,15 +222,18 @@ router.post(routerPath.deleteMultiple, function (req, res) {
     });
 });
 
+// SỬA 1 RECORD
 router.put(routerPath.put, function (req, res) {
+    // INPUT LÀ ID VÀ THÔNG TIN MỚI CỦA RECORD MUỐN SỬA
     let id = req.params.id;
     let body = req.body;
 
-    //ktra có id hay ko
+    // KIỂM TRA ID
     if (!id) {
         return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.MISSING_DATA + " (id)", null);
     }
-    // ktra có body hay là không
+
+    // KIỂM TRA BODY
     if (!body) {
         return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.MISSING_DATA + " (body)", null);
     } else {
@@ -215,10 +243,13 @@ router.put(routerPath.put, function (req, res) {
             return response(res, HTTP_CODE.ERROR_CLIENT, message, null);
         }
     }
+
+    // TRUY VẤN CSDL
     dbConn.query("UPDATE todos SET ? WHERE id = ?", [body, id], function (error, results, fields) {
         if (error) {
             return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
         } else {
+            // KIỂM TRA CÓ TÌM ĐƯỢC ID ĐỂ SỬA KO (QUERY CÓ WHERE)
             if (results.affectedRows === 0) {
                 return response(res, HTTP_CODE.NOT_FOUND, RESPONSE_STRING.ID_NOT_FOUND, results);
             } else {

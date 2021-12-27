@@ -27,6 +27,11 @@ app.use(baseURL + routerPath.todo, todo);
 var product = require("./routes/products");
 app.use(baseURL + routerPath.product, product);
 
+// route not found
+app.use("/", (req, res, next) => {
+    res.status("404").json({ message: "API Route Not found!" });
+});
+
 app.listen(3005, function () {
     console.log("Node app is running on port 3005");
 });

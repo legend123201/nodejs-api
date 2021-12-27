@@ -17,15 +17,18 @@ app.use(cors());
 
 const baseURL = "/api/";
 const routerPath = {
-  todo: "todos",
+    todo: "todos",
+    product: "products",
 };
 
 //import các routers
 var todo = require("./routes/todos");
 app.use(baseURL + routerPath.todo, todo);
+var product = require("./routes/products");
+app.use(baseURL + routerPath.product, product);
 
 app.listen(3005, function () {
-  console.log("Node app is running on port 3005");
+    console.log("Node app is running on port 3005");
 });
 module.exports = app;
 

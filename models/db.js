@@ -4,7 +4,7 @@ var dbConn = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "express_js_db",
+    database: "db_selling_food",
 });
 
 dbConn.connect(function (err) {

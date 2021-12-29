@@ -17,15 +17,27 @@ app.use(cors());
 
 const baseURL = "/api/";
 const routerPath = {
+    staff: "staffs",
     todo: "todos",
     product: "products",
+    user: "users",
+    importOrder: "importOrders",
+    importOrderDetail: "importOrderDetails",
 };
 
 //import các routers
+var staff = require("./routes/staffs");
+app.use(baseURL + routerPath.staff, staff);
 var todo = require("./routes/todos");
 app.use(baseURL + routerPath.todo, todo);
 var product = require("./routes/products");
 app.use(baseURL + routerPath.product, product);
+var user = require("./routes/users");
+app.use(baseURL + routerPath.user, user);
+var importOrder = require("./routes/importOrders");
+app.use(baseURL + routerPath.importOrder, importOrder);
+var importOrderDetail = require("./routes/importOrderDetails");
+app.use(baseURL + routerPath.importOrderDetail, importOrderDetail);
 
 // route not found
 app.use("/", (req, res, next) => {

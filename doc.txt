@@ -1,0 +1,1 @@
+- joi lúc ktra number thì mình cho vào string cũng đc, nhưng string đó phải chuyển qua số đc. vd: "123"

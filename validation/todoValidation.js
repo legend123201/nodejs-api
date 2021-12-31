@@ -3,7 +3,7 @@ const Joi = require("joi");
 const schema = Joi.object({
     id: Joi.number(),
     value: Joi.string().min(1).required(),
-    status: Joi.string().min(1).required(),
+    status: Joi.number().min(1).required(),
 });
 
 const todoValidation = (todo) => {

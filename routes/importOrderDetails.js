@@ -18,7 +18,7 @@ const routerPath = {
 // LẤY TOÀN BỘ DANH SÁCH
 router.get(routerPath.getAll, function (req, res) {
     //KO CÓ INPUT, TIẾN HÀNH TRUY VẤN CSDL LUÔN
-    dbConn.query("SELECT * FROM import_order_detail WHERE import_order_id = 1", function (error, results, fields) {
+    dbConn.query("SELECT * FROM import_order_detail", function (error, results, fields) {
         //if (error) throw error;
         if (error) {
             return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
@@ -29,7 +29,7 @@ router.get(routerPath.getAll, function (req, res) {
     });
 });
 
-// LẤY TOÀN BỘ DANH SÁCH
+// LẤY DANH SÁCH THEO IMPORT ORDER ID
 router.get(routerPath.getItemsByImportOrderId, function (req, res) {
     // INPUT LÀ ID
     let id = req.params.id;
@@ -40,8 +40,7 @@ router.get(routerPath.getItemsByImportOrderId, function (req, res) {
     }
 
     // TRUY VẤN CSDL
-    dbConn.query("SELECT * FROM import_order_detail WHERE import_order_id = ?", function (error, results, fields) {
-        //if (error) throw error;
+    dbConn.query("SELECT * FROM import_order_detail WHERE import_order_id = ?", id, function (error, results, fields) {
         if (error) {
             return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
         } else {

@@ -111,6 +111,11 @@ router.post(routerPath.postMultiple, function (req, res) {
         // KIỂM TRA CÓ PHẢI MẢNG HAY KO
         if (!Array.isArray(body)) {
             return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.ERROR_DATA, null);
+        } else {
+            // KIỂM TRA CÓ PHẦN TỬ NÀO KO
+            if (body.length === 0) {
+                return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.MISSING_DATA + " (body)", null);
+            }
         }
 
         // KIỂM TRA MẢNG OBJECT CÓ HỢP LỆ KO

@@ -7,6 +7,7 @@ const schema = Joi.object({
 });
 
 const importOrderDetailValidation = (importOrderDetail) => {
+    if (importOrderDetail.name) delete importOrderDetail.name;
     const { error } = schema.validate(importOrderDetail);
     if (error) {
         return {

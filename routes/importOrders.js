@@ -18,7 +18,13 @@ const routerPath = {
 // LẤY TOÀN BỘ DANH SÁCH
 router.get(routerPath.getAll, function (req, res) {
     //KO CÓ INPUT, TIẾN HÀNH TRUY VẤN CSDL LUÔN
-    dbConn.query("SELECT * FROM import_order", function (error, results, fields) {
+    const sql =
+        "SELECT import_order.id, import_order.datetime, import_order.staff_id, staff.name" +
+        "\n" +
+        "FROM import_order" +
+        "\n" +
+        "LEFT JOIN staff ON import_order.staff_id = staff.id";
+    dbConn.query(sql, function (error, results, fields) {
         //if (error) throw error;
         if (error) {
             return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);

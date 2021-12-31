@@ -40,7 +40,18 @@ router.get(routerPath.getItemsByImportOrderId, function (req, res) {
     }
 
     // TRUY VẤN CSDL
-    dbConn.query("SELECT * FROM import_order_detail WHERE import_order_id = ?", id, function (error, results, fields) {
+    // câu truy vấn cũ: "SELECT * FROM import_order_detail WHERE import_order_id = ?"
+    const sql =
+        "SELECT import_order_detail.product_id, import_order_detail.quantity, import_order_detail.current_unit_perchase_price, product.name" +
+        "\n" +
+        "FROM import_order_detail" +
+        "\n" +
+        "LEFT JOIN product" +
+        "\n" +
+        "ON import_order_detail.product_id = product.id" +
+        "\n" +
+        "WHERE import_order_detail.import_order_id = ?;";
+    dbConn.query(sql, id, function (error, results, fields) {
         if (error) {
             return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
         } else {

@@ -23,6 +23,7 @@ const routerPath = {
     user: "users",
     importOrder: "importOrders",
     importOrderDetail: "importOrderDetails",
+    bill: "bills",
 };
 
 //import các routers
@@ -38,6 +39,8 @@ var importOrder = require("./routes/importOrders");
 app.use(baseURL + routerPath.importOrder, importOrder);
 var importOrderDetail = require("./routes/importOrderDetails");
 app.use(baseURL + routerPath.importOrderDetail, importOrderDetail);
+var bill = require("./routes/bills");
+app.use(baseURL + routerPath.bill, bill);
 
 // route not found
 app.use("/", (req, res, next) => {

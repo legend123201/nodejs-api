@@ -1,1 +1,2 @@
 - joi lúc ktra number thì mình cho vào string cũng đc, nhưng string đó phải chuyển qua số đc. vd: "123"
+- ngay cả sql cũng vậy, mình gửi id lên hầu hết là theo params, mà params là string.

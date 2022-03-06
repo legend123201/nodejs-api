@@ -25,6 +25,7 @@ const routerPath = {
     importOrderDetail: "importOrderDetails",
     bill: "bills",
     billDetail: "billDetails",
+    cart: "carts",
 };
 
 //import các routers
@@ -44,6 +45,8 @@ var bill = require("./routes/bills");
 app.use(baseURL + routerPath.bill, bill);
 var billDetail = require("./routes/billDetails");
 app.use(baseURL + routerPath.billDetail, billDetail);
+var cart = require("./routes/cart");
+app.use(baseURL + routerPath.cart, cart);
 
 // route not found
 app.use("/", (req, res, next) => {

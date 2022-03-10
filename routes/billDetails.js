@@ -26,13 +26,11 @@ router.get(routerPath.getItemsByBillId, function (req, res) {
     // TRUY VẤN CSDL
 
     const sql =
-        "SELECT bill_detail.product_id, bill_detail.quantity, bill_detail.current_unit_sale_price, product.name" +
+        "SELECT * " +
         "\n" +
-        "FROM bill_detail" +
+        "FROM bill_detail, product, bill" +
         "\n" +
-        "LEFT JOIN product ON bill_detail.product_id = product.id" +
-        "\n" +
-        "WHERE bill_detail.bill_id = ?";
+        "WHERE bill_detail.product_id = product.id AND bill_detail.bill_id = bill.id AND bill_id = ?";
     dbConn.query(sql, id, function (error, results, fields) {
         if (error) {
             return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);

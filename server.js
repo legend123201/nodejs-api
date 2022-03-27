@@ -26,6 +26,7 @@ const routerPath = {
     bill: "bills",
     billDetail: "billDetails",
     cart: "carts",
+    analytic: "analytics",
 };
 
 //import các routers
@@ -45,8 +46,10 @@ var bill = require("./routes/bills");
 app.use(baseURL + routerPath.bill, bill);
 var billDetail = require("./routes/billDetails");
 app.use(baseURL + routerPath.billDetail, billDetail);
-var cart = require("./routes/cart");
+var cart = require("./routes/carts");
 app.use(baseURL + routerPath.cart, cart);
+var analytic = require("./routes/analytics");
+app.use(baseURL + routerPath.analytic, analytic);
 
 // route not found
 app.use("/", (req, res, next) => {

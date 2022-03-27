@@ -14,6 +14,7 @@ const routerPath = {
     getAll: "/",
     getAllSalePage: "/salepage/userId/:id",
     addBill: "/userId/:id",
+    approveBill: "/staffId/:staffId/billId/:billId",
 };
 
 // LẤY TOÀN BỘ DANH SÁCH TRONG DASHBOARD
@@ -161,6 +162,36 @@ router.get(routerPath.addBill, function (req, res) {
                     });
                 }
             });
+        }
+    });
+});
+
+// SỬA 1 RECORD
+router.put(routerPath.approveBill, function (req, res) {
+    // INPUT LÀ STAFF ID VÀ BILL ID
+    let staffId = req.params.staffId;
+    let billId = req.params.billId;
+
+    // KIỂM TRA ID
+    if (!staffId) {
+        return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.MISSING_DATA + " (staffId)", null);
+    }
+
+    if (!billId) {
+        return response(res, HTTP_CODE.ERROR_CLIENT, RESPONSE_STRING.MISSING_DATA + " (billId)", null);
+    }
+
+    // TRUY VẤN CSDL
+    dbConn.query("UPDATE bill SET staff_id = ? WHERE id = ?", [staffId, billId], function (error, results, fields) {
+        if (error) {
+            return response(res, HTTP_CODE.ERROR_SERVER, error.sqlMessage, results);
+        } else {
+            // KIỂM TRA CÓ TÌM ĐƯỢC ID ĐỂ SỬA KO (QUERY CÓ WHERE)
+            if (results.affectedRows === 0) {
+                return response(res, HTTP_CODE.NOT_FOUND, RESPONSE_STRING.ID_NOT_FOUND, results);
+            } else {
+                return response(res, HTTP_CODE.SUCCESS, RESPONSE_STRING.PUT_SUCCESS, results);
+            }
         }
     });
 });

@@ -21,7 +21,7 @@ const routerPath = {
 router.get(routerPath.getAll, function (req, res) {
     //KO CÓ INPUT, TIẾN HÀNH TRUY VẤN CSDL LUÔN
     const sql =
-        "SELECT bill.id, bill.datetime, bill.user_id, user.name as user_name, bill.staff_id, staff.name as staff_name" +
+        "SELECT bill.id, bill.datetime, bill.user_id, user.name as user_name, bill.staff_id, staff.name as staff_name, IF(bill.staff_id IS NULL,0,1) AS isApproved" +
         "\n" +
         "FROM bill" +
         "\n" +
@@ -50,7 +50,7 @@ router.get(routerPath.getAllSalePage, function (req, res) {
     }
 
     const sql =
-        "SELECT bill_id, datetime, staff_id, SUM(current_unit_sale_price * quantity) as total" +
+        "SELECT bill_id, datetime, staff_id, SUM(current_unit_sale_price * quantity) as total, IF(staff_id IS NULL,0,1) AS isApproved" +
         "\n" +
         "FROM bill, bill_detail" +
         "\n" +

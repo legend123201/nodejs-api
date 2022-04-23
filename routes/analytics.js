@@ -76,7 +76,7 @@ router.get(routerPath.analyticRevenueByMonth, function (req, res) {
                 const yearOfBill = new Date(item.datetime).getFullYear();
                 const monthOfBill = new Date(item.datetime).getMonth();
 
-                if (yearOfBill === currentYear - 1) {
+                if (yearOfBill === currentYear) {
                     analyticRevenueByMonth[monthOfBill] += item.billPrice;
                 }
             });

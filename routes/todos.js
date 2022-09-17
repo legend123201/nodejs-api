@@ -6,6 +6,8 @@ const HTTP_CODE = require("../ultis/httpCode");
 const RESPONSE_STRING = require("../ultis/responseString");
 const todoValidation = require("../validation/todoValidation");
 
+// test text for git testing
+
 //express mới nhất tích hợp sẵn body parser rồi nên chỉ cần sử dụng 2 dòng dưới đây
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
